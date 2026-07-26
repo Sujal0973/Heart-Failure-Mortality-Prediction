@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Do's & Don'ts — Reduce Heart Failure Risk</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#071023;color:#e6eef8;padding:28px}
+    .card{max-width:900px;margin:auto;background:rgba(255,255,255,0.02);padding:20px;border-radius:12px}
+    h1{margin-top:0}
+    h2{margin-bottom:6px}
+    ul{line-height:1.6}
+    .note{color:#94a3b8;font-size:13px;margin-top:12px}
+    a{color:#60a5fa}
+    .section{padding:12px;border-radius:10px;margin-bottom:10px;background:rgba(255,255,255,0.01)}
+    .highlight{border-left:4px solid #60a5fa;padding-left:10px}
+    .urgent{border-left:4px solid #ef4444}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Do's & Don'ts — Reduce Heart Failure Risk</h1>
+    <p class="note">This page offers general suggestions. It is not medical advice. Consult a healthcare professional.</p>
+
+    <div id="tailoredBox" class="section" style="display:none"></div>
+
+    <h2 id="very-low">Very Low risk — what to keep doing</h2>
+    <div class="section highlight">
+      <ul>
+        <li>Maintain medication adherence, healthy diet, and activity.</li>
+        <li>Keep routine follow-ups and monitoring.</li>
+      </ul>
+    </div>
+
+    <h2 id="low">Low risk — small improvements</h2>
+    <div class="section">
+      <ul>
+        <li>Reduce sodium intake; monitor weight for sudden gains.</li>
+        <li>Increase light-moderate activity after physician approval.</li>
+      </ul>
+    </div>
+
+    <h2 id="moderate">Moderate risk — discuss with clinician</h2>
+    <div class="section">
+      <ul>
+        <li>Schedule a review to check medications, kidney/electrolyte tests.</li>
+        <li>Keep a symptom diary (breathlessness, swelling, fatigue).</li>
+      </ul>
+    </div>
+
+    <h2 id="high">High risk — prompt review advised</h2>
+    <div class="section urgent">
+      <ul>
+        <li>Contact your healthcare provider for urgent review.</li>
+        <li>Watch for rapid weight gain (>2 kg in 2 days), worsening breathlessness, chest pain — seek care.</li>
+      </ul>
+    </div>
+
+    <h2 id="very-high">Very High risk — seek urgent attention</h2>
+    <div class="section urgent">
+      <ul>
+        <li>Seek emergency care for severe symptoms.</li>
+        <li>Bring medication list and recent results to your provider.</li>
+      </ul>
+    </div>
+
+    <p class="note">Show this page + your results to your clinician for tailored care.</p>
+    <p style="margin-top:18px"><a href="index.html">← Back to predictor</a></p>
+  </div>
+
+  <script>
+  // Show a small tailored box if hash is present
+  function showTailored(){
+    const tail = document.getElementById('tailoredBox');
+    const h = location.hash ? location.hash.replace('#','') : null;
+    if (!h) return;
+    let title = '', bullets = [];
+    if (h === 'very-low'){ title='Very Low — keep doing'; bullets=['Maintain meds and healthy lifestyle.','Routine monitoring.']; }
+    else if (h === 'low'){ title='Low — small improvements'; bullets=['Reduce sodium and monitor weight.','Light exercise after approval.']; }
+    else if (h === 'moderate'){ title='Moderate — speak to your clinician'; bullets=['Review medications.','Keep symptom diary.']; }
+    else if (h === 'high'){ title='High — prompt review advised'; bullets=['Contact provider soon.','Watch warning signs.']; }
+    else if (h === 'very-high'){ title='Very High — seek urgent care'; bullets=['Seek emergency care for severe symptoms.','Bring meds and tests.']; }
+    if (title){
+      tail.style.display='block';
+      tail.innerHTML = `<strong>${title}</strong><ul>${bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`;
+      const el = document.getElementById(h);
+      if (el) el.scrollIntoView({behavior:'smooth'});
+    }
+  }
+  window.addEventListener('load', showTailored);
+  </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Heart Failure Risk Predictor</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --muted:#94a3b8;
+      --accent:#60a5fa;
+      --success:#16a34a;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --radius:12px;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+    }
+    body{margin:0;background:linear-gradient(180deg,#071023,#041027);color:#e6eef8}
+    .app{max-width:1100px;margin:28px auto;padding:28px}
+    header{display:flex;justify-content:space-between;align-items:center}
+    h1{margin:0;font-size:20px}
+    a{color:var(--accent);text-decoration:none;font-weight:600}
+    .layout{display:grid;grid-template-columns:1fr 420px;gap:20px;margin-top:18px}
+    .card{background:rgba(255,255,255,0.02);padding:16px;border-radius:12px}
+    .controls{display:grid;gap:10px}
+    .control{display:flex;align-items:center;gap:12px}
+    label{width:170px;color:var(--muted);display:flex;align-items:center}
+    .field{flex:1;display:flex;gap:8px;align-items:center}
+    input[type=range]{width:100%}
+    input[type=number]{width:120px;padding:6px;border-radius:8px;border:none}
+    select{padding:8px;border-radius:8px;border:none}
+    .actions{display:flex;gap:8px;margin-top:12px}
+    button{cursor:pointer;padding:8px 12px;border-radius:10px;border:none;font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),#3b82f6);color:#041027}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .small{font-size:12px;color:var(--muted)}
+    .gauge{display:flex;gap:16px;align-items:center}
+    .circle{width:120px;height:120px;border-radius:999px;display:grid;place-items:center;background:conic-gradient(#60a5fa 0deg, rgba(255,255,255,0.02) 0deg)}
+    .advice-banner{margin-top:12px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);display:none}
+    canvas{width:100%;height:160px}
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} .circle{width:100px;height:100px} }
+
+    /* tooltip styling (custom) */
+    .info {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width:20px; height:20px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.03);
+      color:var(--muted);
+      font-size:12px;
+      cursor:help;
+      margin-left:8px;
+    }
+    .info:focus { outline: 2px dashed rgba(255,255,255,0.06); }
+    .info .tt {
+      position: absolute;
+      left: 110%;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width:180px;
+      max-width:320px;
+      background: rgba(3,7,18,0.95);
+      color: #dfecff;
+      padding:8px 10px;
+      border-radius:8px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      font-size:12px;
+      line-height:1.3;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity .12s ease, transform .12s ease;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .info .tt::before{
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+      width:10px; height:10px;
+      background: rgba(3,7,18,0.95);
+      border-radius:2px;
+    }
+    .info:hover .tt,
+    .info:focus .tt,
+    .info:focus-within .tt {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(-50%) translateX(6px);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div><h1>Heart Failure Risk Predictor</h1></div>
+      <div class="small">Status: <span id="status">Initializing…</span></div>
+    </header>
+
+    <div style="margin-top:8px"><a id="dosLink" href="dos_donts.html">Reduce your risk — Do's & Don'ts</a></div>
+
+    <div class="layout">
+      <main>
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">Inputs</h3>
+          <div id="inputs" class="controls">Loading controls...</div>
+          <div class="actions">
+            <button id="predictBtn" class="btn-primary">Predict</button>
+            <button id="fillLow" class="btn-ghost">Fill Low-risk</button>
+            <button id="fillHigh" class="btn-ghost">Fill Very-high</button>
+            <button id="resetBtn" class="btn-ghost">Reset</button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="result-panel">
+        <div class="card">
+          <div class="gauge">
+            <div class="circle" id="gaugeCircle"><div id="percent">—</div></div>
+            <div>
+              <div id="riskLabel" style="font-weight:800">—</div>
+              <div class="small" id="probText">Probability: —</div>
+              <div style="height:8px;margin-top:8px;background:rgba(255,255,255,0.02);border-radius:8px;overflow:hidden">
+                <div id="miniBar" style="height:100%;width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="adviceBanner" class="advice-banner"></div>
+
+          <div style="margin-top:12px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:8px" class="small">Very Low</div>
+              <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:8px" class="small">Low</div>
+              <div style="background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:8px" class="small">Moderate</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 style="margin:0 0 8px 0">Probability history</h4>
+          <canvas id="historyChart"></canvas>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+  // --- config + metadata
+  const API = 'http://127.0.0.1:8000/predict';
+  const statusEl = document.getElementById('status');
+  const inputsDiv = document.getElementById('inputs');
+  const percentEl = document.getElementById('percent');
+  const riskLabel = document.getElementById('riskLabel');
+  const probText = document.getElementById('probText');
+  const miniBar = document.getElementById('miniBar');
+  const gaugeCircle = document.getElementById('gaugeCircle');
+  const adviceBanner = document.getElementById('adviceBanner');
+  const dosLink = document.getElementById('dosLink');
+
+  const thresholds = {very_low:0.05, low:0.15, moderate:0.35, high:0.7};
+  const colors = {"Very Low":"#16a34a","Low":"#60a5fa","Moderate":"#f59e0b","High":"#f97316","Very High":"#ef4444"};
+  const anchors = {"Very Low":"very-low","Low":"low","Moderate":"moderate","High":"high","Very High":"very-high"};
+
+  const featureMeta = [
+    {k:'age', label:'Age (years)', type:'range', min:40, max:95, step:1, default:60, tip:'Patient age in years; older age increases risk.'},
+    {k:'anaemia', label:'Anaemia', type:'cat', options:['No','Yes'], default:'No', tip:'Whether patient has anaemia (low hemoglobin).'},
+    {k:'creatinine_phosphokinase', label:'Creatinine Phosphokinase', type:'range', min:20, max:8000, step:1, default:200, tip:'CPK enzyme level — very high values indicate muscle damage.'},
+    {k:'diabetes', label:'Diabetes', type:'cat', options:['No','Yes'], default:'No', tip:'History of diabetes.'},
+    {k:'ejection_fraction', label:'Ejection Fraction (%)', type:'range', min:14, max:70, step:1, default:50, tip:'Percentage of blood the left ventricle pumps out; lower is worse.'},
+    {k:'high_blood_pressure', label:'High Blood Pressure', type:'cat', options:['No','Yes'], default:'No', tip:'History of hypertension.'},
+    {k:'platelets', label:'Platelets (per mL)', type:'range', min:100000, max:500000, step:1000, default:300000, tip:'Platelet count; very low or very high counts can be problematic.'},
+    {k:'serum_creatinine', label:'Serum Creatinine (mg/dL)', type:'range', min:0.5, max:9.4, step:0.1, default:1.0, tip:'Kidney function marker; higher values indicate worse renal function.'},
+    {k:'serum_sodium', label:'Serum Sodium (mEq/L)', type:'range', min:113, max:148, step:1, default:137, tip:'Sodium level; low sodium (hyponatremia) is associated with worse outcomes.'},
+    {k:'sex', label:'Sex', type:'cat', options:['Female','Male'], default:'Male', tip:'Biological sex.'},
+    {k:'smoking', label:'Smoking', type:'cat', options:['No','Yes'], default:'No', tip:'Current or prior smoking status.'},
+    {k:'time', label:'Follow-up time (days)', type:'range', min:4, max:285, step:1, default:100, tip:'Number of days since start of follow-up.'}
+  ];
+
+  let history = [];
+
+  function mapRisk(prob){
+    if (prob < thresholds.very_low) return 'Very Low';
+    if (prob < thresholds.low) return 'Low';
+    if (prob < thresholds.moderate) return 'Moderate';
+    if (prob < thresholds.high) return 'High';
+    return 'Very High';
+  }
+
+  // UPDATED buildControls() with custom tooltip
+  function buildControls(){
+    inputsDiv.innerHTML = '';
+    featureMeta.forEach(f=>{
+      const row = document.createElement('div'); row.className='control';
+
+      // label container
+      const label = document.createElement('label');
+      label.htmlFor = 'f_'+f.k;
+      label.innerText = f.label;
+
+      // info icon (custom tooltip)
+      const info = document.createElement('span');
+      info.className = 'info';
+      info.setAttribute('tabindex','0'); // keyboard focusable
+      info.setAttribute('aria-label', f.tip);
+
+      // small visible letter inside circle
+      info.innerText = 'i';
+
+      // tooltip box
+      const tt = document.createElement('span');
+      tt.className = 'tt';
+      tt.innerText = f.tip;
+      info.appendChild(tt);
+
+      // add info to label
+      label.appendChild(info);
+
+      const field = document.createElement('div'); field.className='field';
+      if (f.type === 'cat'){
+        const sel = document.createElement('select'); sel.id = 'f_'+f.k;
+        f.options.forEach(opt=> sel.add(new Option(opt,opt)));
+        sel.value = f.default;
+        field.appendChild(sel);
+      } else {
+        const range = document.createElement('input'); range.type='range'; range.id='f_'+f.k;
+        range.min=f.min; range.max=f.max; range.step=f.step; range.value=f.default;
+        const num = document.createElement('input'); num.type='number'; num.id='n_'+f.k;
+        num.value=f.default; num.min=f.min; num.max=f.max; num.step=f.step;
+        range.addEventListener('input', ()=>{ num.value = range.value; });
+        num.addEventListener('input', ()=>{ range.value = num.value; });
+        field.appendChild(range); field.appendChild(num);
+      }
+
+      row.appendChild(label); row.appendChild(field); inputsDiv.appendChild(row);
+    });
+
+    document.getElementById('predictBtn').addEventListener('click', predict);
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
+    document.getElementById('fillLow').addEventListener('click', ()=> fillExample('low'));
+    document.getElementById('fillHigh').addEventListener('click', ()=> fillExample('high'));
+
+    statusEl.innerText = 'Ready';
+  }
+
+  function collectInputs(){
+    const data = {};
+    featureMeta.forEach(f=>{
+      const el = document.getElementById('f_'+f.k);
+      if (f.type === 'cat'){
+        if (f.k === 'sex') data[f.k] = (el.value === 'Male') ? 1 : 0;
+        else data[f.k] = (el.value === 'Yes') ? 1 : 0;
+      } else {
+        const val = Number(document.getElementById('n_'+f.k).value);
+        data[f.k] = val;
+      }
+    });
+    return data;
+  }
+
+  function bannerForRisk(r){
+    const anchor = anchors[r] || 'moderate';
+    if (r === 'Very Low') return `Your predicted risk is <strong>${r}</strong>. <a href="dos_donts.html#${anchor}">View tips</a>.`;
+    if (r === 'Low') return `Predicted risk: <strong>${r}</strong>. <a href="dos_donts.html#${anchor}">View tips</a>.`;
+    if (r === 'Moderate') return `Predicted risk: <strong>${r}</strong>. Consider discussing with your clinician — <a href="dos_donts.html#${anchor}">recommended actions</a>.`;
+    if (r === 'High') return `Predicted risk: <strong>${r}</strong>. Contact your healthcare provider soon — <a href="dos_donts.html#${anchor}">urgent recommendations</a>.`;
+    return `Predicted risk: <strong>${r}</strong>. Seek prompt medical evaluation — <a href="dos_donts.html#${anchor}">what to do now</a>.`;
+  }
+
+  async function predict(){
+    const payload = {data: collectInputs()};
+    statusEl.innerText = 'Predicting…';
+    try{
+      const resp = await fetch(API, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(payload)});
+      const j = await resp.json();
+      if (j.error){ statusEl.innerText='API error'; console.error(j); return; }
+      const prob = Number(j.probability || 0); const pct = Math.round(prob*100);
+      percentEl.innerText = pct + '%';
+      probText.innerText = 'Probability: ' + prob.toFixed(3);
+      const r = j.risk || mapRisk(prob);
+      riskLabel.innerText = r; riskLabel.style.color = colors[r] || '#fff';
+      miniBar.style.width = (prob*100) + '%'; miniBar.style.background = colors[r];
+      gaugeCircle.style.background = `conic-gradient(${colors[r]} ${prob*360}deg, rgba(255,255,255,0.02) ${prob*360}deg)`;
+      adviceBanner.innerHTML = bannerForRisk(r); adviceBanner.style.display = 'block';
+      dosLink.href = `dos_donts.html#${anchors[r]}`;
+      statusEl.innerText = 'Ready';
+      history.push({t:new Date().toLocaleTimeString(), p:prob}); if(history.length>12) history.shift(); drawChart();
+    }catch(err){
+      statusEl.innerText='Network error'; console.error(err);
+    }
+  }
+
+  function resetForm(){
+    featureMeta.forEach(f=>{
+      const el = document.getElementById('f_'+f.k);
+      if (f.type === 'cat') el.value = f.default;
+      else { el.value = f.default; document.getElementById('n_'+f.k).value = f.default; }
+    });
+    adviceBanner.style.display = 'none';
+  }
+
+  function fillExample(kind){
+    if (kind === 'low'){
+      const vals = {age:45, anaemia:0, creatinine_phosphokinase:200, diabetes:0, ejection_fraction:60, high_blood_pressure:0, platelets:300000, serum_creatinine:0.9, serum_sodium:140, sex:1, smoking:0, time:250};
+      featureMeta.forEach(f=>{
+        const el = document.getElementById('f_'+f.k);
+        if (f.type === 'cat'){ if (f.k==='sex') el.value = vals[f.k]===1 ? 'Male' : 'Female'; else el.value = vals[f.k]===1 ? 'Yes' : 'No'; }
+        else { el.value = vals[f.k]; document.getElementById('n_'+f.k).value = vals[f.k]; }
+      });
+    } else {
+      const vals = {age:85, anaemia:1, creatinine_phosphokinase:6000, diabetes:1, ejection_fraction:20, high_blood_pressure:1, platelets:120000, serum_creatinine:3.5, serum_sodium:125, sex:1, smoking:1, time:30};
+      featureMeta.forEach(f=>{
+        const el = document.getElementById('f_'+f.k);
+        if (f.type === 'cat'){ if (f.k==='sex') el.value = vals[f.k]===1 ? 'Male' : 'Female'; else el.value = vals[f.k]===1 ? 'Yes' : 'No'; }
+        else { el.value = vals[f.k]; document.getElementById('n_'+f.k).value = vals[f.k]; }
+      });
+    }
+  }
+
+  // simple chart
+  const canvas = document.getElementById('historyChart'); const ctx = canvas.getContext('2d');
+  function drawChart(){
+    const d = history; const w = canvas.width = canvas.clientWidth; const h = canvas.height = canvas.clientHeight; ctx.clearRect(0,0,w,h);
+    if (!d.length) return;
+    const pad = 24; const barW = (w - pad*2) / d.length * 0.7;
+    d.forEach((it,i)=>{
+      const x = pad + i * ((w - pad*2)/d.length) + ((w - pad*2)/d.length - barW)/2;
+      const ph = it.p; const barH = ph * (h - pad*2); const y = h - pad - barH;
+      ctx.fillStyle = '#60a5fa'; ctx.fillRect(x, y, barW, barH);
+      ctx.fillStyle = '#bcd'; ctx.font = '11px Inter, Arial'; ctx.fillText((it.p*100).toFixed(0)+'%', x, y - 6); ctx.fillText(it.t, x, h - 6);
+    });
+  }
+
+  // start
+  window.addEventListener('DOMContentLoaded', buildControls);
+  </script>
+</body>
+</html>
