@@ -7,11 +7,11 @@ import numpy as np
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 
-WORKDIR = Path(r"C:\Users\sujal\OneDrive\Documents\MINIP")  # adjust if needed
+WORKDIR = Path(__file__).resolve().parent
 
-MODEL_PKL = WORKDIR / "final_heart_failure_xgb.pkl"
-SCALER_PKL = WORKDIR / "scaler.pkl"
-CSV = WORKDIR / "heart_failure_clinical_records_dataset.csv"
+MODEL_PKL = WORKDIR / "models" / "final_heart_failure_xgb.pkl"
+SCALER_PKL = WORKDIR / "models" / "scaler.pkl"
+CSV = WORKDIR / "data" / "heart_failure_clinical_records_dataset.csv"
 
 # Load model and scaler
 model = joblib.load(MODEL_PKL)
