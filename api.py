@@ -17,16 +17,26 @@ CSV = WORKDIR / "data" / "heart_failure_clinical_records_dataset.csv"
 model = joblib.load(MODEL_PKL)
 scaler = joblib.load(SCALER_PKL)
 
-# Infer feature order from CSV (exclude label column)
-df = pd.read_csv(CSV)
-label_names = {'death_event','death','DEATH_EVENT','target'}
-features = [c for c in df.columns if c.lower() not in label_names]
-
-# If your model expects a different order, replace `features` with exact list
-print("Using feature order:", features)
+# Infer feature order (fallback to scaler or default list if CSV not present)
+if CSV.exists():
+    df = pd.read_csv(CSV)
+    label_names = {'death_event', 'death', 'DEATH_EVENT', 'target'}
+    features = [c for c in df.columns if c.lower() not in label_names]
+elif hasattr(scaler, "feature_names_in_"):
+    features = list(scaler.feature_names_in_)
+else:
+    features = [
+        'age', 'anaemia', 'creatinine_phosphokinase', 'diabetes',
+        'ejection_fraction', 'high_blood_pressure', 'platelets',
+        'serum_creatinine', 'serum_sodium', 'sex', 'smoking', 'time'
+    ]
 
 # FastAPI app
-app = FastAPI(title="HF Mortality Predictor")
+app = FastAPI(
+    title="Heart Failure Mortality Prediction API",
+    description="Machine Learning REST API for predicting heart failure mortality risk using clinical patient parameters.",
+    version="1.0.0"
+)
 
 # allow local web page to call it
 app.add_middleware(
@@ -46,31 +56,55 @@ def scale_input(x_list):
         mean = np.array(scaler.mean_)
         scale = np.array(scaler.scale_)
         arr = np.array(x_list, dtype=float)
-        return (arr - mean) / (scale + 1e-12)
+        return ((arr - mean) / (scale + 1e-12)).reshape(1, -1)
     # fallback: return raw
-    return np.array(x_list, dtype=float)
+    return np.array(x_list, dtype=float).reshape(1, -1)
 
 def map_risk(prob):
-    # same thresholds used earlier; tune if required
+    # 5-tier mortality risk stratification
     if prob < 0.05: return "Very Low"
     if prob < 0.15: return "Low"
     if prob < 0.35: return "Moderate"
-    if prob < 0.7: return "High"
+    if prob < 0.70: return "High"
     return "Very High"
+
+@app.get("/")
+def root():
+    return {
+        "title": "Heart Failure Mortality Prediction API",
+        "version": "1.0.0",
+        "status": "online",
+        "docs_url": "/docs",
+        "health_url": "/health",
+        "model": "XGBClassifier (Tuned)",
+        "features": features
+    }
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "scaler_loaded": scaler is not None,
+        "feature_count": len(features)
+    }
 
 @app.post("/predict")
 def predict(inp: InputData):
     # expect inp.data to contain feature:value for all features
     try:
+        if not inp.data:
+            return {"error": "Input data dictionary cannot be empty."}
+
         x_list = [float(inp.data.get(f, 0.0)) for f in features]
-        x_scaled = scale_input(x_list).reshape(1, -1)
+        x_scaled = scale_input(x_list)
 
         # model may be sklearn-like with predict_proba or produce single regression
         prob = None
         if hasattr(model, "predict_proba"):
             probs = model.predict_proba(x_scaled)
-            # assume death class index is 1 (change if needed)
-            prob = float(probs[0,1])
+            # assume death class index is 1
+            prob = float(probs[0, 1])
         else:
             # fallback: model.predict returns probability-like or numeric
             out = model.predict(x_scaled)
