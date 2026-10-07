@@ -2,92 +2,500 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Do's & Don'ts — Reduce Heart Failure Risk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clinical Guidelines & Do's and Don'ts — CardioPulse AI</title>
+  <meta name="description" content="Evidence-based heart failure lifestyle recommendations and clinical management protocols stratified by risk severity." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#071023;color:#e6eef8;padding:28px}
-    .card{max-width:900px;margin:auto;background:rgba(255,255,255,0.02);padding:20px;border-radius:12px}
-    h1{margin-top:0}
-    h2{margin-bottom:6px}
-    ul{line-height:1.6}
-    .note{color:#94a3b8;font-size:13px;margin-top:12px}
-    a{color:#60a5fa}
-    .section{padding:12px;border-radius:10px;margin-bottom:10px;background:rgba(255,255,255,0.01)}
-    .highlight{border-left:4px solid #60a5fa;padding-left:10px}
-    .urgent{border-left:4px solid #ef4444}
+    :root {
+      --bg-dark: #070d1e;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --border-subtle: rgba(148, 163, 184, 0.12);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #3b82f6;
+      --risk-very-low: #10b981;
+      --risk-low: #38bdf8;
+      --risk-moderate: #f59e0b;
+      --risk-high: #f97316;
+      --risk-critical: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: radial-gradient(circle at 10% 10%, #0d1b3e 0%, #070d1e 50%, #030712 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 30px 20px 60px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header Bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(56, 189, 248, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .page-hero {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-glass);
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #f8fafc, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Filter Pills */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* Tailored Banner */
+    #tailoredBox {
+      display: none;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(56, 189, 248, 0.15));
+      border: 1px solid var(--accent-cyan);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Protocol Cards */
+    .tier-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-glass);
+      transition: transform 0.2s ease;
+      position: relative;
+    }
+
+    .tier-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      border-top-left-radius: var(--radius-lg);
+      border-bottom-left-radius: var(--radius-lg);
+    }
+
+    .tier-card.very-low::before { background: var(--risk-very-low); }
+    .tier-card.low::before { background: var(--risk-low); }
+    .tier-card.moderate::before { background: var(--risk-moderate); }
+    .tier-card.high::before { background: var(--risk-high); }
+    .tier-card.very-high::before { background: var(--risk-critical); }
+
+    .tier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tier-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tier-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .tier-tag.very-low { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .tier-tag.low { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .tier-tag.moderate { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .tier-tag.high { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+    .tier-tag.very-high { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+    .tier-h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .guideline-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .guideline-cols { grid-template-columns: 1fr; }
+    }
+
+    .column-box {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+
+    .col-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .col-title.do { color: #34d399; }
+    .col-title.dont { color: #f87171; }
+    .col-title.urgent { color: #fb923c; }
+
+    ul.clean-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    ul.clean-list li {
+      position: relative;
+      padding-left: 18px;
+      line-height: 1.5;
+    }
+
+    ul.clean-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--text-dim);
+    }
+
+    .disclaimer-footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Do's & Don'ts — Reduce Heart Failure Risk</h1>
-    <p class="note">This page offers general suggestions. It is not medical advice. Consult a healthcare professional.</p>
+  <div class="container">
+    <header>
+      <div class="brand-wrap">
+        <span style="font-size:22px;">🫀</span>
+        <span class="brand-title">CardioPulse AI Guidelines</span>
+      </div>
+      <a href="index.html" class="back-btn">&larr; Return to Diagnostic Predictor</a>
+    </header>
 
-    <div id="tailoredBox" class="section" style="display:none"></div>
+    <div class="page-hero">
+      <h1>Clinical Protocols & Evidence-Based Lifestyle Guide</h1>
+      <p class="hero-desc">
+        Comprehensive clinical management strategies and patient lifestyle recommendations organized across the 5 calibrated risk tiers.
+      </p>
 
-    <h2 id="very-low">Very Low risk — what to keep doing</h2>
-    <div class="section highlight">
-      <ul>
-        <li>Maintain medication adherence, healthy diet, and activity.</li>
-        <li>Keep routine follow-ups and monitoring.</li>
-      </ul>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterTier('all')">Show All Protocols</button>
+        <button class="filter-btn" onclick="filterTier('very-low')">🟢 Very Low (&lt;5%)</button>
+        <button class="filter-btn" onclick="filterTier('low')">🔵 Low (5–15%)</button>
+        <button class="filter-btn" onclick="filterTier('moderate')">🟡 Moderate (15–35%)</button>
+        <button class="filter-btn" onclick="filterTier('high')">🟠 High (35–70%)</button>
+        <button class="filter-btn" onclick="filterTier('very-high')">🔴 Very High (&ge;70%)</button>
+      </div>
     </div>
 
-    <h2 id="low">Low risk — small improvements</h2>
-    <div class="section">
-      <ul>
-        <li>Reduce sodium intake; monitor weight for sudden gains.</li>
-        <li>Increase light-moderate activity after physician approval.</li>
-      </ul>
+    <!-- Tailored Assessment Box -->
+    <div id="tailoredBox"></div>
+
+    <!-- VERY LOW RISK -->
+    <div class="tier-card very-low" id="very-low">
+      <div class="tier-header">
+        <div class="tier-title-wrap">
+          <span class="tier-tag very-low">Very Low (&lt;5%)</span>
+          <h2 class="tier-h2">Stable Cardiac Profile — Maintenance & Preservation</h2>
+        </div>
+      </div>
+      <div class="guideline-cols">
+        <div class="column-box">
+          <div class="col-title do">✓ Recommended Actions (Do's)</div>
+          <ul class="clean-list">
+            <li>Maintain 100% adherence to prescribed baseline cardiac medications.</li>
+            <li>Engage in 150 minutes of weekly moderate aerobic exercise (walking, swimming).</li>
+            <li>Maintain a balanced Mediterranean-style diet low in processed saturated fats.</li>
+            <li>Schedule routine annual cardiovascular follow-up consultations.</li>
+          </ul>
+        </div>
+        <div class="column-box">
+          <div class="col-title dont">&times; Precautions (Don'ts)</div>
+          <ul class="clean-list">
+            <li>Do not discontinue heart failure medications even if asymptomatic.</li>
+            <li>Avoid high-sodium packaged foods (>2,300 mg daily).</li>
+            <li>Avoid heavy alcohol consumption and tobacco exposure.</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <h2 id="moderate">Moderate risk — discuss with clinician</h2>
-    <div class="section">
-      <ul>
-        <li>Schedule a review to check medications, kidney/electrolyte tests.</li>
-        <li>Keep a symptom diary (breathlessness, swelling, fatigue).</li>
-      </ul>
+    <!-- LOW RISK -->
+    <div class="tier-card low" id="low">
+      <div class="tier-header">
+        <div class="tier-title-wrap">
+          <span class="tier-tag low">Low (5–15%)</span>
+          <h2 class="tier-h2">Favorable Baseline with Minor Emerging Markers</h2>
+        </div>
+      </div>
+      <div class="guideline-cols">
+        <div class="column-box">
+          <div class="col-title do">✓ Recommended Actions (Do's)</div>
+          <ul class="clean-list">
+            <li>Restrict daily dietary sodium strictly below 2,000 mg (2 grams) per day.</li>
+            <li>Record daily morning weight upon waking; log in patient symptom journal.</li>
+            <li>Schedule regular outpatient checkups every 6 months with electrolyte review.</li>
+            <li>Stay adequately hydrated without fluid overload.</li>
+          </ul>
+        </div>
+        <div class="column-box">
+          <div class="col-title dont">&times; Precautions (Don'ts)</div>
+          <ul class="clean-list">
+            <li>Do not ignore progressive pedal swelling or unusual ankle puffiness.</li>
+            <li>Avoid over-the-counter NSAIDs (e.g., ibuprofen, naproxen) which induce renal fluid retention.</li>
+            <li>Do not engage in unaccustomed intense isometric strain without physician clearance.</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <h2 id="high">High risk — prompt review advised</h2>
-    <div class="section urgent">
-      <ul>
-        <li>Contact your healthcare provider for urgent review.</li>
-        <li>Watch for rapid weight gain (>2 kg in 2 days), worsening breathlessness, chest pain — seek care.</li>
-      </ul>
+    <!-- MODERATE RISK -->
+    <div class="tier-card moderate" id="moderate">
+      <div class="tier-header">
+        <div class="tier-title-wrap">
+          <span class="tier-tag moderate">Moderate (15–35%)</span>
+          <h2 class="tier-h2">Elevated Physiological Stress — Comprehensive Review</h2>
+        </div>
+      </div>
+      <div class="guideline-cols">
+        <div class="column-box">
+          <div class="col-title urgent">⚠️ Clinical Management Protocols</div>
+          <ul class="clean-list">
+            <li>Book a dedicated clinical cardiology review within 2 to 4 weeks.</li>
+            <li>Order follow-up comprehensive metabolic panel: serum creatinine, BUN, and sodium/potassium.</li>
+            <li>Evaluate guideline-directed medical therapy (GDMT) optimization: ACEi/ARNI, beta-blocker, SGLT2i, MRA.</li>
+            <li>Maintain daily fluid restriction (typically 1.5–2.0 liters/day if advised by physician).</li>
+          </ul>
+        </div>
+        <div class="column-box">
+          <div class="col-title dont">&times; Critical Red Flags to Watch</div>
+          <ul class="clean-list">
+            <li>Watch for weight gain exceeding 1.5 kg (3.3 lbs) over 48 hours.</li>
+            <li>Do not overlook shortness of breath upon lying flat (orthopnea requiring extra pillows).</li>
+            <li>Avoid salt substitutes containing high potassium unless specifically approved by nephrologist.</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <h2 id="very-high">Very High risk — seek urgent attention</h2>
-    <div class="section urgent">
-      <ul>
-        <li>Seek emergency care for severe symptoms.</li>
-        <li>Bring medication list and recent results to your provider.</li>
-      </ul>
+    <!-- HIGH RISK -->
+    <div class="tier-card high" id="high">
+      <div class="tier-header">
+        <div class="tier-title-wrap">
+          <span class="tier-tag high">High (35–70%)</span>
+          <h2 class="tier-h2">Significant Decompensation Risk — Urgent Consultation</h2>
+        </div>
+      </div>
+      <div class="guideline-cols">
+        <div class="column-box">
+          <div class="col-title urgent">🚨 Priority Clinical Interventions</div>
+          <ul class="clean-list">
+            <li>Contact cardiology specialist clinic for prompt priority consultation within 48 to 72 hours.</li>
+            <li>Evaluate need for intravenous or escalated loop diuretic dosing for congestion relief.</li>
+            <li>Perform echocardiogram to re-evaluate left ventricular ejection fraction and valve competence.</li>
+            <li>Assess cardio-renal status; monitor for acute kidney injury exacerbation.</li>
+          </ul>
+        </div>
+        <div class="column-box">
+          <div class="col-title dont">&times; Immediate Warning Thresholds</div>
+          <ul class="clean-list">
+            <li>Rapid fluid accumulation (>2 kg / 4.4 lbs in 2 days) requires immediate clinic notification.</li>
+            <li>Do not delay seeking acute care for chest pressure, persistent cough, or daytime confusion.</li>
+            <li>Rest in an upright or elevated head-of-bed posture.</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <p class="note">Show this page + your results to your clinician for tailored care.</p>
-    <p style="margin-top:18px"><a href="index.html">← Back to predictor</a></p>
+    <!-- VERY HIGH RISK -->
+    <div class="tier-card very-high" id="very-high">
+      <div class="tier-header">
+        <div class="tier-title-wrap">
+          <span class="tier-tag very-high">Very High (&ge;70%)</span>
+          <h2 class="tier-h2">Critical Mortality Probability — Emergency Care Required</h2>
+        </div>
+      </div>
+      <div class="guideline-cols">
+        <div class="column-box">
+          <div class="col-title urgent">🚑 Emergency Action Protocol</div>
+          <ul class="clean-list">
+            <li>Seek immediate emergency department or acute heart failure inpatient triage.</li>
+            <li>Bring all current prescription bottles, recent laboratory panels, and this assessment report.</li>
+            <li>Prepare for continuous hemodynamic monitoring, intravenous inotropic support, or intensive telemetry.</li>
+            <li>Conduct multi-disciplinary review with advanced heart failure and heart transplantation teams if indicated.</li>
+          </ul>
+        </div>
+        <div class="column-box">
+          <div class="col-title dont">&times; Life-Threatening Manifestations</div>
+          <ul class="clean-list">
+            <li>Severe dyspnea at rest, pink frothy sputum (pulmonary edema), or cyanosis.</li>
+            <li>Syncope (fainting), profound lethargy, cold extremities, or systolic BP &lt; 90 mmHg.</li>
+            <li>Do not drive oneself to the hospital; summon emergency medical transport immediately.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-footer">
+      CardioPulse AI Clinical Intelligence &bull; Evidence-based cardiology guidance compiled from ESC and AHA guidelines &bull; Not for primary unassisted clinical diagnosis.
+    </div>
   </div>
 
   <script>
-  // Show a small tailored box if hash is present
-  function showTailored(){
-    const tail = document.getElementById('tailoredBox');
-    const h = location.hash ? location.hash.replace('#','') : null;
-    if (!h) return;
-    let title = '', bullets = [];
-    if (h === 'very-low'){ title='Very Low — keep doing'; bullets=['Maintain meds and healthy lifestyle.','Routine monitoring.']; }
-    else if (h === 'low'){ title='Low — small improvements'; bullets=['Reduce sodium and monitor weight.','Light exercise after approval.']; }
-    else if (h === 'moderate'){ title='Moderate — speak to your clinician'; bullets=['Review medications.','Keep symptom diary.']; }
-    else if (h === 'high'){ title='High — prompt review advised'; bullets=['Contact provider soon.','Watch warning signs.']; }
-    else if (h === 'very-high'){ title='Very High — seek urgent care'; bullets=['Seek emergency care for severe symptoms.','Bring meds and tests.']; }
-    if (title){
-      tail.style.display='block';
-      tail.innerHTML = `<strong>${title}</strong><ul>${bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`;
-      const el = document.getElementById(h);
-      if (el) el.scrollIntoView({behavior:'smooth'});
+    function filterTier(tier) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.tier-card');
+      if (tier === 'all') {
+        cards.forEach(c => c.style.display = 'block');
+      } else {
+        cards.forEach(c => {
+          if (c.id === tier) {
+            c.style.display = 'block';
+            c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            c.style.display = 'none';
+          }
+        });
+      }
     }
-  }
-  window.addEventListener('load', showTailored);
+
+    function checkHash() {
+      const h = location.hash ? location.hash.replace('#', '') : null;
+      if (!h) return;
+      const target = document.getElementById(h);
+      if (target) {
+        const box = document.getElementById('tailoredBox');
+        box.style.display = 'block';
+        box.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#38bdf8; font-size:15px;">Tailored Guideline for Your Current Assessment (${h.replace('-', ' ').toUpperCase()})</strong>
+              <p style="font-size:13px; color:#cbd5e1; margin-top:4px;">Directing you to the prioritized clinical protocol below.</p>
+            </div>
+            <button onclick="document.getElementById('tailoredBox').style.display='none'" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;">&times;</button>
+          </div>
+        `;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    window.addEventListener('load', checkHash);
   </script>
 </body>
 </html>

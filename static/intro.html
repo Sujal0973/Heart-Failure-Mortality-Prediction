@@ -2,82 +2,264 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Heart Failure Risk Prediction — Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome — CardioPulse AI Clinical Decision Support</title>
+  <meta name="description" content="AI-assisted clinical decision support for heart failure mortality risk stratification." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --accent:#60a5fa;
-      --bg:#0f172a;
-      --muted:#94a3b8;
-      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      --bg-dark: #070d1e;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --border-subtle: rgba(148, 163, 184, 0.12);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin:0;
-      background:radial-gradient(circle at 20% 20%, #101935 0%, #050a19 100%);
-      color:#e6eef8;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: radial-gradient(circle at 10% 10%, #0d1b3e 0%, #070d1e 50%, #030712 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      line-height: 1.6;
     }
-    .card {
-      background:rgba(255,255,255,0.03);
-      padding:40px 50px;
-      border-radius:16px;
-      box-shadow:0 8px 30px rgba(0,0,0,0.5);
-      max-width:600px;
-      text-align:center;
-      animation:fadeIn 0.6s ease;
+
+    .hero-container {
+      max-width: 860px;
+      width: 100%;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 44px 48px;
+      box-shadow: var(--shadow-glass);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    .hero-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #10b981, #38bdf8, #f59e0b, #ef4444);
+    }
+
+    .heart-logo {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.2));
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.3);
+    }
+
+    .heart-logo svg {
+      width: 32px;
+      height: 32px;
+      fill: none;
+      stroke: #f43f5e;
+      stroke-width: 2.2;
+      animation: heartbeat 1.6s infinite ease-in-out;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.18); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.15); }
+      70% { transform: scale(1); }
+    }
+
     h1 {
-      margin:0 0 16px 0;
-      font-size:28px;
-      color:#e6eef8;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #f8fafc, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
     }
-    p {
-      color:var(--muted);
-      font-size:15px;
-      line-height:1.6;
-      margin-bottom:28px;
+
+    p.subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 32px;
     }
-    button {
-      padding:12px 28px;
-      border:none;
-      border-radius:10px;
-      font-size:16px;
-      font-weight:600;
-      background:linear-gradient(90deg,var(--accent),#3b82f6);
-      color:#041027;
-      cursor:pointer;
-      transition:all .2s ease;
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+      text-align: left;
     }
-    button:hover {
-      transform:translateY(-2px);
-      box-shadow:0 6px 18px rgba(96,165,250,0.4);
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-container { padding: 30px 24px; }
     }
-    .note {
-      font-size:13px;
-      color:#64748b;
-      margin-top:24px;
+
+    .feat-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      transition: all 0.2s ease;
     }
-    @keyframes fadeIn {
-      from {opacity:0; transform:translateY(20px);}
-      to {opacity:1; transform:translateY(0);}
+
+    .feat-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(56, 189, 248, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .feat-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .feat-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .feat-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .cta-row {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 26px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn-secondary {
+      padding: 14px 24px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .disclaimer-box {
+      margin-top: 32px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(245, 158, 11, 0.06);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      font-size: 12px;
+      color: #cbd5e1;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .disclaimer-box strong {
+      color: #fbbf24;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Welcome to the Heart Failure Risk Predictor</h1>
-    <p>
-      This tool uses clinical parameters such as age, blood markers, and health conditions 
-      to estimate your risk of heart failure–related mortality.
-      <br><br>
-      It is designed for educational and research purposes only — not as a medical diagnosis.
+  <div class="hero-container">
+    <div class="heart-logo">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+
+    <h1>CardioPulse AI Decision Support</h1>
+    <p class="subtitle">
+      A clinically calibrated artificial intelligence platform estimating heart failure mortality risk using 12 routine diagnostic parameters.
     </p>
-    <button onclick="window.location.href='index.html'">Start Prediction</button>
-    <div class="note">
-      Make sure your local server is running before continuing.
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🫀</div>
+        <div class="feat-title">Tuned XGBoost Engine</div>
+        <div class="feat-desc">Imbalance-weighted gradient boosting achieving 83.3% test accuracy and 0.879 ROC-AUC on patient cohorts.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🧪</div>
+        <div class="feat-title">12 Clinical Markers</div>
+        <div class="feat-desc">Synthesizes ejection fraction, renal clearance (creatinine), electrolytes, CPK, and comorbid histories in real-time.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📈</div>
+        <div class="feat-title">5-Tier Stratification</div>
+        <div class="feat-desc">Maps continuous probabilities into actionable clinical bands: Very Low, Low, Moderate, High, and Very High.</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="index.html" class="btn-primary">
+        <span>Launch Diagnostic Predictor</span>
+        <span>&rarr;</span>
+      </a>
+      <a href="dos_donts.html" class="btn-secondary">
+        <span>📋 Clinical Do's & Don'ts</span>
+      </a>
+    </div>
+
+    <div class="disclaimer-box">
+      <strong>Clinical Disclaimer:</strong> This application is intended for academic research, education, and clinical decision support. It does not replace comprehensive medical judgment or diagnostic echocardiography. Healthcare providers must evaluate all patient findings.
     </div>
   </div>
 </body>
